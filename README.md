@@ -5,7 +5,7 @@ This project explores the Avengers dataset from FiveThirtyEight to answer the fo
 - How many Earth-616 heroes are full-time or honorary Avengers?
 - How many of The Avengers are female?
 - How many times have they died in the comics?
-- How many of the original Avengers are still alive?
+- How many of the original Avengers are still active?
 
 The dataset was cleaned and analyzed in R using `tidyverse`, and the final report is in `data_project_final.Rmd`.
 
