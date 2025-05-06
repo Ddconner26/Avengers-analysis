@@ -78,7 +78,6 @@ if (!dir.exists("results")) {
 The dataset used in this analysis comes from FiveThirtyEight’s GitHub data repository. It contains information on 173 members of the Avengers,Here is the link:
 [https://github.com/fivethirtyeight/data/raw/master/avengers/avengers.csv](https://github.com/fivethirtyeight/data/raw/master/avengers/avengers.csv)
 
-```{r
 
 ```
 ```{r}
@@ -113,17 +112,61 @@ avengers_clean %>%
 group_by(Gender) %>%
 summarise(Average_Deaths = mean(Deaths_Total, na.rm = TRUE)) %>%
 ggplot(aes(x = Gender, y = Average_Deaths, fill = Gender)) +
-geom_col() +
+geom_point(size= 5) +
 labs(
 title = "Average Deaths by Gender (Earth-616 Avengers)",
 x = "Gender",
 y = "Average Number of Deaths"
 ) +
 theme_minimal()
-ggsave("results/deaths_by_gender_plot.png", width = 8, height = 6)
+ggsave("results/deaths_by_gender_scatter.png", width = 8, height = 6)
 
+
+
+original_avengers <- avengers_clean %>%
+filter(Name.Alias %in% originals) %>%
+mutate(Status = ifelse(Name.Alias == "Thor Odinson", "Still Active", "Not Active"))
+
+ggplot(original_avengers, aes(x = Name.Alias, fill = Status)) +
+geom_col() +
+geom_text(stat = "count", aes(label = Status), vjust = -0.5, size = 5, color = "black") +
+scale_fill_manual(values = c("Still Active" = "red", "Not Active" = "steelblue")) +
+labs(
+title = "Status of Original Avengers (Earth-616)",
+x = "Original Avenger",
+y = "Count",
+fill = "Status"
+) +
+theme_minimal()
+
+
+p<-avengers_clean %>% count(Membership_Type)%>%
+  mutate(Percent=n/sum(n)) %>%
+  ggplot( aes(x = "",y =Percent, fill= Membership_Type)) +
+geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y")+
+  geom_text(aes(label = n),position=position_stack(vjust=0.5),color="white",size =5)+
+labs(title = "Number of Full vs. Honorary Avengers (Earth-616)",
+x = "Avenger Type"
+) +
+theme_void()
+
+
+ggsave("full_vs_honorary_pie.png",plot=p,width=6 , height = 6)
+
+avengers_gender<-data.frame(Gender = c("Female","Male"),count= c(58,115))
+p<-ggplot(avengers_gender,aes(x="",y=count,fill=Gender))+
+  geom_bar(stat = "identity",width = 1)+
+  coord_polar(theta="y")+
+  theme_void()+
+  geom_text(aes(label=paste0(count)),
+            position=position_stack(vjust = 0.5),
+            color="white",size=5)+
+  scale_fill_manual(values=c("pink","skyblue"))+
+  ggtitle("Gender Breakdown of Earth-616 Avengers")
+
+ggsave("avengers_gender_pie.png",plot=p,width = 6,height = 6)
 ```
-
 ## Get the stats
 ```{r}
 total_earth616<-nrow(avengers_clean)
@@ -142,13 +185,14 @@ original_alive<-avengers_clean %>%filter(Name.Alias %in% originals)
 
 Write up your thoughts about this data science project here and answer the following questions:
 
-- What did you find out in regards to your original question?From the Avengers dataset i was focused my analysis on characters from Earth-616 who were Full or Honorary Avengers.
+#What did you find out in regards to your original question?
+From the Avengers dataset i was focused my analysis on characters from Earth-616 who were Full or Honorary Avengers.
 There are over 140 Earth-616 Avengers who are either full-time or honorary members.
 Approximately 13-14% of these Avengers are female, showing a historic gender imbalance on the team.Many Avengers have died in the comics on average, each character died about 0.5 to 1 time with some like Jocasta dying up to 5 times.Out of the originals Avengers(from 1963),
 only Thor Odinson is still condsidered active/alive as of the data's timeline(2015).
 The Rest(Iron Man,Hulk,Hank Pym,Wasp) were marked dead or inactive in some form.
 
-- What exceptions or caveats do you have in regards to your analysis you did?
+#What exceptions or caveats do you have in regards to your analysis you did?
 Some characters had inconsistent or missing data(e.g,,missing death records or alternate spellings). The dataset ends in 2015,so it doesn't include newer Avengers storylines or character revivals after that year. Some characters from alternate universe were present
 in the data but excluded in our Earth-616 focus.
 
@@ -175,3 +219,22 @@ Session info is a good thing to print out at the end of your notebooks so that y
 ```{r}
 sessionInfo()
 ```
+
+
+
+
+
+
+
+-
+
+
+
+
+
+
+
+
+
+
+
